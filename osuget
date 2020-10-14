@@ -35,7 +35,7 @@ notify() {
 
 INPUT="$1"
 if [ ! "$INPUT" ] || ! echo "$INPUT" | grep -E "^([0-9]+|https:\/\/osu\.ppy\.sh\/(b|beatmapsets)\/[0-9].*)$" > /dev/null; then
-	notify "Error" "invalid input, expected beatmapset id or url"
+	notify "Error" "Invalid input, expected beatmapset id or url. Input: $*"
 	exit 1
 fi
 
@@ -43,15 +43,15 @@ GAMEDIR="${OSU_GAMEDIR:-$2}"
 ID=$(get_beatmapset_id "$INPUT")
 
 if [ ! "$ID" ]; then
-	notify "Error" "invalid id"
+	notify "Error" "Invalid id"
 	exit 2
 fi
 
-notify "Download" "Download started, id: $ID"
+notify "Download started" "ID: $ID"
 
 if download "$GAMEDIR" "$(get_download_url "$ID")" "$(get_page_url "$ID")"; then
-	notify "Download" "Download finished, id: $ID"
+	notify "Download finished" "ID: $ID"
 else
-	notify "Error" "Download failed, id: $ID"
+	notify "Download failed" "ID: $ID"
 	exit 3
 fi
