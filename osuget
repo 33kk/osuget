@@ -24,25 +24,34 @@ download() {
 	DOWNLOAD_PATH=$(echo "$1" | sed "s!^~/!$HOME/!")
 	DOWNLOAD_URL="$2"
 	REFERER_URL="$3"
-	# notify-send Debug "$DOWNLOAD_URL $DOWNLOAD_PATH $REFERER_URL"
+	# notify Debug "$DOWNLOAD_URL $DOWNLOAD_PATH $REFERER_URL"
 	wget --timestamping --content-disposition --header="$OSU_COOKIE" --header "Referer: $REFERER_URL" "$DOWNLOAD_URL" --directory-prefix="$DOWNLOAD_PATH"
 }
 
 notify() {
+	echo "osuget: $1 $2"
 	notify-send --app-name=osuget --urgency=low "$1" "$2"
 }
 
 INPUT="$1"
+if [ ! "$INPUT" ] || ! echo "$INPUT" | grep -E "^([0-9]+|https:\/\/osu\.ppy\.sh\/(b|beatmaps)\/[0-9].*)$" > /dev/null; then
+	notify "Error" "invalid input, expected beatmapset id or url"
+	exit 1
+fi
+
 GAMEDIR="${OSU_GAMEDIR:-$2}"
 ID=$(get_beatmapset_id "$INPUT")
 
 if [ ! "$ID" ]; then
-	echo osuget: invalid input, enter beatmapset id or url
-	exit 1
+	notify "Error" "invalid id"
+	exit 2
 fi
 
-notify "BeatmapSet download started..." "ID: $ID"
+notify "Download" "Download started, id: $ID"
 
-download "$GAMEDIR" "$(get_download_url "$ID")" "$(get_page_url "$ID")"
-
-notify "BeatmapSet download finished!" "ID: $ID"
+if download "$GAMEDIR" "$(get_download_url "$ID")" "$(get_page_url "$ID")"; then
+	notify "Download" "Download finished, id: $ID"
+else
+	notify "Error" "Download failed, id: $ID"
+	exit 3
+fi
