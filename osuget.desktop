@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=OsuGet
+Exec=osuget %u
+Icon=osu
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+StartupNotify=true
+MimeType=x-scheme-handler/osuget;
