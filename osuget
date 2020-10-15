@@ -34,7 +34,7 @@ notify() {
 }
 
 INPUT="$1"
-if [ ! "$INPUT" ] || ! echo "$INPUT" | grep -E "^([0-9]+|https:\/\/osu\.ppy\.sh\/(b|beatmapsets)\/[0-9].*)$" > /dev/null; then
+if [ ! "$INPUT" ] || ! echo "$INPUT" | grep -E "^((osuget:\/?\/?)?[0-9]+|https:\/\/osu\.ppy\.sh\/(b|beatmapsets)\/[0-9].*)$" > /dev/null; then
 	notify "Error" "Invalid input. Expected beatmapset ID or URL. Input: $*"
 	exit 1
 fi
