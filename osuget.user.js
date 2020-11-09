@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        OsuGet
 // @namespace   github.com/33kk/osuget
-// @match       https://osu.ppy.sh/beatmapsets*
+// @match       https://osu.ppy.sh/*
 // @grant       none
 // @version     1.0
 // @author      33KK
@@ -15,6 +15,7 @@ function getBeatmapSetId(str) {
 }
 
 function click(e) {
+	if (!window.location.pathname.startsWith("/beatmapsets")) return;
 	let t;
 	if (e.target) {
 		if (e.target.href) {
