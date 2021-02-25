@@ -1,0 +1,14 @@
+#!/bin/sh
+
+. "${XDG_CONFIG_HOME:-$HOME/.config}/osuget/config"
+
+notify() {
+	echo "osuget hook: $1 $2"
+	notify-send --app-name=osuget --urgency=low "$1" "$2"
+}
+
+DOWNLOAD_PATH=$(echo "$OSU_GAMEDIR" | sed "s!^~/!$HOME/!")
+
+mv "$3" "$3".osz
+mv "$3".osz "$DOWNLOAD_PATH"
+notify "Download finished" "$(basename "$3" ".osz")"

@@ -1,5 +1,10 @@
 #!/bin/sh
 
+DIR=$( cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P )
+if ! pidof aria2c >/dev/null 2>&1; then
+	aria2c --enable-rpc=true --on-download-complete="$DIR/osuget-hook" --dir="$(mktemp -d)" --max-concurrent-downloads=2 --max-connection-per-server=2 -D
+fi
+
 . "${XDG_CONFIG_HOME:-$HOME/.config}/osuget/config"
 
 get_download_url() {
@@ -22,10 +27,12 @@ get_beatmapset_id() {
 
 download() {
 	DOWNLOAD_PATH=$(echo "$1" | sed "s!^~/!$HOME/!")
-	DOWNLOAD_URL="$2"
-	REFERER_URL="$3"
+	ID="$2"
+	DOWNLOAD_URL="$3"
+	REFERER_URL="$4"
 	# notify Debug "$DOWNLOAD_URL $DOWNLOAD_PATH $REFERER_URL"
-	wget --timestamping --content-disposition --header="$OSU_COOKIE" --header "Referer: $REFERER_URL" "$DOWNLOAD_URL" --directory-prefix="$DOWNLOAD_PATH"
+	curl http://localhost:6800/jsonrpc -d "{\"jsonrpc\":\"2.0\",\"id\":\"$ID\",\"method\":\"aria2.addUri\",\"params\":[[\"$DOWNLOAD_URL\"], {\"conditional-get\": true, \"allow-overwrite\": true, \"auto-file-renaming\": false, \"content-disposition-default-utf8\": true, \"header\": \"$OSU_COOKIE\", \"referer\": \"$REFERER_URL\"}]}"
+	# wget --timestamping --content-disposition --header="$OSU_COOKIE" --header "Referer: $REFERER_URL" "$DOWNLOAD_URL" --directory-prefix="$DOWNLOAD_PATH"
 }
 
 notify() {
@@ -47,10 +54,10 @@ if [ ! "$ID" ]; then
 	exit 2
 fi
 
-notify "Download started" "ID: $ID"
-
-if download "$GAMEDIR" "$(get_download_url "$ID")" "$(get_page_url "$ID")"; then
-	notify "Download finished" "ID: $ID"
+if download "$GAMEDIR" "$ID" "$(get_download_url "$ID")" "$(get_page_url "$ID")"; then
+	#notify "Download finished" "ID: $ID"
+	notify "Download started" "ID: $ID"
+	exit 0
 else
 	notify "Download failed" "ID: $ID"
 	exit 3

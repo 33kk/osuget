@@ -11,6 +11,7 @@ mkdir -p ~/.local/bin ~/.local/share/applications ~/.config/osuget
 
 echo Linking files...
 ln -sf "$DIR/osuget" ~/.local/bin
+ln -sf "$DIR/osuget-hook" ~/.local/bin
 ln -sf "$DIR/osuget.desktop" ~/.local/share/applications
 
 echo Creating default config...
