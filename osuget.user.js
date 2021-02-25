@@ -14,6 +14,11 @@ function getBeatmapSetId(str) {
 	return str.match(idRegex)[1];
 }
 
+function listen() {
+  document.querySelector("html").removeEventListener("click", click);
+  document.querySelector("html").addEventListener("click", click);
+}
+
 function click(e) {
 	if (!window.location.pathname.startsWith("/beatmapsets")) return;
 	let t;
@@ -27,7 +32,7 @@ function click(e) {
 		}
 	}
 	if (t) {
-		if (t.classList && t.classList.contains("js-beatmapset-download-link") && idRegex.test(t.href)) {
+		if (t.classList && t.classList.contains("js-beatmapset-download-link") && t.classList.contains("beatmapset-panel__icon") && idRegex.test(t.href)) {
 			console.log("osuget: click");
 			t.href = "osuget:" + getBeatmapSetId(t.href);
 		} else if (t.classList && t.classList.contains("btn-osu-big--beatmapset-header") && t.href === "https://osu.ppy.sh/home/support") {
@@ -36,4 +41,6 @@ function click(e) {
 	}
 }
 
-document.querySelector("html").addEventListener("click", click);
+window.addEventListener("popstate", listen);
+
+listen();
