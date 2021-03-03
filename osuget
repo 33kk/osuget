@@ -16,17 +16,16 @@ get_page_url() {
 }
 
 get_beatmapset_id() {
-	ID=$(echo "$@" | sed -E 's!.*(osuget:|https?:\/\/osu\.ppy\.sh\/(b|beatmapsets)\/)([0-9]+).*!\3!')
-	if echo "$@" | grep "https://osu.ppy.sh/b/" > /dev/null; then
-		BEATMAPSET_URL=$(curl -L --head "$@" | grep location | sed "s/location: //")
+	if echo "$@" | grep -E "^https?://osu.ppy.sh/b/" > /dev/null; then
+		BEATMAPSET_URL=$(curl -sL --head "$(echo "$@" | sed -E "s!^http://!https://!")" | grep location | sed "s/location: //")
 		get_beatmapset_id "$BEATMAPSET_URL"
 	else
-		echo "$ID"
+		echo "$@" | sed -E 's!.*(osuget:|https?:\/\/osu\.ppy\.sh\/(b|beatmapsets)\/)([0-9]+).*!\3!'
 	fi
 }
 
 download() {
-	DOWNLOAD_PATH=$(echo "$1" | sed "s!^~/!$HOME/!")
+	# DOWNLOAD_PATH=$(echo "$1" | sed "s!^~/!$HOME/!")
 	ID="$2"
 	DOWNLOAD_URL="$3"
 	REFERER_URL="$4"
