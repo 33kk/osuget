@@ -1,8 +1,10 @@
 #!/bin/sh
 
+
 DIR=$( cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P )
 if ! pidof aria2c >/dev/null 2>&1; then
-	aria2c --enable-rpc=true --on-download-complete="$DIR/osuget-hook" --dir="$(mktemp -d)" --max-concurrent-downloads=2 --max-connection-per-server=2 -D --log=/tmp/osuget-aria2.log
+	mkdir /tmp/osuget
+	aria2c --enable-rpc=true --on-download-complete="$DIR/osuget-hook" --dir="/tmp/osuget" --max-concurrent-downloads=2 --max-connection-per-server=2 -D --log=/tmp/osuget/aria2.log
 fi
 
 . "${XDG_CONFIG_HOME:-$HOME/.config}/osuget/config"
@@ -51,6 +53,14 @@ ID=$(get_beatmapset_id "$INPUT")
 if [ ! "$ID" ]; then
 	notify "Error" "Invalid ID"
 	exit 2
+fi
+
+if [ "$(find "$GAMEDIR" -maxdepth 1 -regextype posix-extended -iregex ".*/$ID([^0-9]|$)")" != '' ]; then
+	notify "Error" "Beatmapset is already downloaded"
+	exit 4
+elif [ "$(find "/tmp/osuget" -maxdepth 1 -regextype posix-extended -iregex ".*/$ID([^0-9]|$)")" != '' ]; then
+	notify "Error" "Beatmapset is already downloading"
+	exit 5
 fi
 
 if download "$GAMEDIR" "$ID" "$(get_download_url "$ID")" "$(get_page_url "$ID")"; then
