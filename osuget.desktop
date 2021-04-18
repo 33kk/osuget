@@ -2,7 +2,7 @@
 Version=1.0
 Name=OsuGet
 Exec=osuget %u
-Icon=osu
+Icon=download
 Terminal=false
 X-MultipleArgs=false
 Type=Application

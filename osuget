@@ -54,7 +54,7 @@ fi
 if [ "$(find "$GAMEDIR" -maxdepth 1 -regextype posix-extended -iregex ".*/$ID([^0-9][^/]*|\$)")" != '' ]; then
 	notify "Error" "Beatmapset is already downloaded"
 	exit 4
-elif [ "$(find "/tmp/osuget" -maxdepth 1 -regextype posix-extended -iregex ".*/$ID.osz")" != '' ]; then
+elif [ "$(find "/tmp/osuget" -maxdepth 1 -regextype posix-extended -iregex ".*/$ID(\\..*|$)")" != '' ]; then
 	notify "Error" "Beatmapset is already downloading"
 	exit 5
 fi
