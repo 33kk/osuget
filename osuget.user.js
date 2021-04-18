@@ -23,24 +23,49 @@ function click(e) {
 	if (!window.location.pathname.startsWith("/beatmapsets")) return;
 	let t;
 	if (e.target) {
-		if (e.target.href) {
-			t = e.target;
-		} else if (e.target.parentElement && e.target.parentElement.href) {
-			t = e.target.parentElement;
-		} else if (e.target.parentElement.parentElement && e.target.parentElement.parentElement.href) {
-			t = e.target.parentElement.parentElement;
-		}
+    let tmp = e.target;
+		for (let i = 0; i < 10 && !t && tmp.parentElement; i++) {
+      if (tmp.href) {
+        t = tmp;
+        break;
+      }
+      tmp = tmp.parentElement;
+    }
 	}
 	if (t) {
-		if (t.classList && t.classList.contains("js-beatmapset-download-link") && t.classList.contains("beatmapset-panel__icon") && idRegex.test(t.href)) {
-			console.log("osuget: click");
+		if (t.classList && ((t.classList.contains("js-beatmapset-download-link") && t.classList.contains("beatmapset-panel__icon")) || t.classList.contains("beatmapset-panel__menu-item")) && idRegex.test(t.href)) {
 			t.href = "osuget:" + getBeatmapSetId(t.href);
-		} else if (t.classList && t.classList.contains("btn-osu-big--beatmapset-header") && t.href === "https://osu.ppy.sh/home/support") {
+		}
+    else if (t.classList && t.classList.contains("btn-osu-big--beatmapset-header") && t.href && t.href.includes("/support")) {
 			t.href = "osuget:" + getBeatmapSetId(window.location.href);
 		}
+    else {
+      return;
+    }
+    console.log(`osuget: ${t.href}`);
 	}
+}
+
+function hookHistory() {
+  let _pushState = history.pushState;
+  let _replaceState = history.replaceState;
+  
+  function pushState(...args) {
+    _pushState(...args);
+    console.log("osuget: pushState hook");
+    setTimeout(listen, 100);
+  }
+  function replaceState(...args) {
+    _replaceState(...args);
+    console.log("osuget: replaceState hook");
+    setTimeout(listen, 100);
+  }
+  
+  history.pushState = pushState;
+  history.replaceState = replaceState;
 }
 
 window.addEventListener("popstate", listen);
 
+hookHistory();
 listen();
