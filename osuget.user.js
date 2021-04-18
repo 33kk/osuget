@@ -46,26 +46,6 @@ function click(e) {
 	}
 }
 
-function hookHistory() {
-  let _pushState = history.pushState;
-  let _replaceState = history.replaceState;
-  
-  function pushState(...args) {
-    _pushState(...args);
-    console.log("osuget: pushState hook");
-    setTimeout(listen, 100);
-  }
-  function replaceState(...args) {
-    _replaceState(...args);
-    console.log("osuget: replaceState hook");
-    setTimeout(listen, 100);
-  }
-  
-  history.pushState = pushState;
-  history.replaceState = replaceState;
-}
-
 window.addEventListener("popstate", listen);
 
-hookHistory();
 listen();
